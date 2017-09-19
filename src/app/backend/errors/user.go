@@ -2,6 +2,36 @@ package errors
 
 import "fmt"
 
+// ErrNameReserved ...
+type ErrNameReserved struct {
+	Name string
+}
+
+// IsErrNameReserved ...
+func IsErrNameReserved(err error) bool {
+	_, ok := err.(ErrNameReserved)
+	return ok
+}
+
+func (err ErrNameReserved) Error() string {
+	return fmt.Sprintf("name is reserved [name: %s]", err.Name)
+}
+
+// ErrNamePatternNotAllowed ...
+type ErrNamePatternNotAllowed struct {
+	Pattern string
+}
+
+// IsErrNamePatternNotAllowed ...
+func IsErrNamePatternNotAllowed(err error) bool {
+	_, ok := err.(ErrNamePatternNotAllowed)
+	return ok
+}
+
+func (err ErrNamePatternNotAllowed) Error() string {
+	return fmt.Sprintf("name pattern is not allowed [pattern: %s]", err.Pattern)
+}
+
 // EmptyName ...
 type EmptyName struct{}
 

@@ -8,50 +8,88 @@ type Email struct {
   IsActivation bool
 }
 
-// GetEmailByID ...
-func GetEmailByID(uid int64)(*Email, error){
-  email:= &Email{}
-
-	 rows, err := x.Query("select * from user", uid)
-	 if err != nil {
-		 return nil, err
-	 }
-	 defer rows.Close()
-	 for rows.Next() {
-		 err = rows.Scan(email)
-		 if err != nil {
-			 return nil, err
-		 }
-	 }
-   return email, err
+// EmailQueue ...
+type EmailQueue struct {
+  ID int64
+  Recipient string
+  Subject string
+  Message string
+  IsError bool
+  ErrorMessage string
 }
 
-// GetEmail ...
-func GetEmail(email string)(*Email, error){
-  email = &Email{}
-
-	 rows, err := x.Query("select * from user", email)
-	 if err != nil {
-		 return false, err
-	 }
-	 defer rows.Close()
-	 for rows.Next() {
-		 err = rows.Scan(email)
-		 if err != nil {
-			 return false, err
-		 }
-	 }
-   return email, err
+// ReceivingEmailConfig ...
+type ReceivingEmailConfig struct {
+  ID int64
+  Protocol string
+  Server string
+  SSL bool
+  Port int
+  UserName string
+  Password string
+  UID int64
+  AccessKey string
+  HasAttach bool
 }
 
-// IsEmailUsed ...
-func IsEmailUsed(email string) (bool, error) {
-  if len(email) == 0 {
-    return true, nil
-  }
-  _, err := GetEmailByID(uid)
+type ReceivedEmail struct {
+  ID int64
+  UID int64
+  ConfigID int64
+  MessageID int64
+  Time int64
+  From string
+  Subject string
+  Content string
+  QuestionID int64
+  TicketID int64
+}
+
+type WeixinThirdPartyAPI struct {
+  ID int64
+  AccountID int64
+  URL string
+  Token string
+  Enabled bool
+  Rank int
+}
+
+type HelpChapter struct {
+  ID int64
+  Title string
+  Description string
+  URLToken string
+  Sort int
+}
+
+
+
+
+
+
+
+
+//Activate mark email as active
+func (email *Email) Activate() (err error) {
+  user, err := GetUserByID(email.UID)
   if err != nil {
-    return false, err
+    return err
   }
-    return true, nil
+
+  session := engine.NewSession()
+  defer session.Close()
+
+  if err = session.Begin(); err != nil {
+    return err
+  }
+
+  email.IsActivation = true
+
+  if _, err := session.ID(email.ID).AllCols().Update(email); err != nil {
+    return err
+  } else if err = updateUser(session, user); err != nil {
+    return err
+  }
+
+  return session.Commit()
 }
