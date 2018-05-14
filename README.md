@@ -18,8 +18,7 @@ Goals of the project:
 **To hack or modify** the templates or add a new platform, use the scripts in this repo to boot and tear down clusters.
 
 ### Architecture overview
-See the architecture below:
-![](docs/architecture.png)
+![Yunus](docs/architecture.png)
 
 
 ### Install
